@@ -1,38 +1,67 @@
 #include"Paddle.h"
 #include"Brick.h"
 using namespace std;
+
+
+
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(800, 600), "BREAKOUT!");
     window.setVerticalSyncEnabled(true);
     Clock clock;
-
+    int gameLevel = 0;
 
     Paddle paddle;
     Ball mainBall;
-
-#pragma region BrickInit
-
-    vector<sf::Vector2f> BrickPosition;
-    sf::Vector2f brickStartPos = sf::Vector2f(620.f, 75.f);
-    int brickCount = 1;
-    bool areAllBrickDestroyed = false;
-
-    for (float i = 0; i < brickCount; i++)
-    {
-        BrickPosition.push_back(brickStartPos);
-        cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y <<endl;
-        brickStartPos.x -= 45;
-        brickStartPos.y += 45;
-    }
-
     vector<Brick> bricks;
 
-    for (float i = 0; i < BrickPosition.size(); i++)
-    {
-        Brick brick(1, BrickPosition[i]);
-        bricks.push_back(brick);
+    sf::Font font;
+    sf::Text GameOverText;
+    const char* fontPath = "American Captain.ttf";
+    if (!font.loadFromFile(fontPath)) {
+        cout << "Failed to load font\n";
     }
+
+    GameOverText.setFont(font);
+    GameOverText.setFillColor(sf::Color::White);
+    GameOverText.setPosition(300.f, 300.f);
+
+    bool areAllBrickDestroyed;
+    int brickCount;
+#pragma region BrickInit
+    
+    if (gameLevel == 0)
+    {
+        vector<sf::Vector2f> BrickPosition;
+        sf::Vector2f brickStartPos = sf::Vector2f(620.f, 75.f);
+        brickCount = 2;
+        areAllBrickDestroyed = false;
+
+        for (float i = 0; i < brickCount; i++)
+        {
+            BrickPosition.push_back(brickStartPos);
+            cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
+            brickStartPos.x -= 45;
+            brickStartPos.y += 45;
+        }
+
+        
+
+        for (float i = 0; i < BrickPosition.size(); i++)
+        {
+            Brick brick(1, BrickPosition[i]);
+            bricks.push_back(brick);
+        }
+    }
+
+    else if (gameLevel == 2) 
+    {
+        vector<sf::Vector2f> BrickPosition;
+        sf::Vector2f brickStartPos = sf::Vector2f(620.f, 75.f);
+        int brickCount = 10;
+        bool areAllBrickDestroyed = false;
+    }
+    
 
 #pragma endregion
 
@@ -181,79 +210,36 @@ int main()
         {
 
         }
-//#pragma region GameHasEnded
-//        if (mainBall.player1Point >= 2 || mainBall.player2Point >= 2)
-//        {
-//            if (mainBall.player1Point >= 5)
-//            {
-//                cout << "RED HAS WON THE GAME!\n";
-//                cout << "Do you want to restart the game? Press Space to continue the game. Press Q to quit the game \n";
-//                message.setString("YOU   HAVE   WON   THE   GAME! \n Do you want to restart the game? \n Press    Space    to continue the game \n Press    Q    to quit the game \n");
-//                bool playerHasEnteredTheInput = false;
-//                while (!playerHasEnteredTheInput)
-//                {
-//                    window.clear();
-//                    window.draw(message);
-//                    window.display();
-//                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
-//                    {
-//                        playerHasEnteredTheInput = true;
-//                        mainBall.player1Point = 0;
-//                        mainBall.player2Point = -1;
-//                        mainBall.player1Score.setString("0");
-//                        mainBall.player2Score.setString("0");
-//                        paddle.paddle.setPosition(paddle.InitialPostion);
-//                        paddle.paddle.setSize(sf::Vector2f(15.0f, 145.0f));
-//                        leftPlayer.paddle.setSize(sf::Vector2f(15.0f, 145.0f));
-//                        mainBall.ball.setPosition(mainBall.InitialPosition);
-//                    }
-//
-//                    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q))
-//                    {
-//                        return 1;
-//                    }
-//                }
-//                playerHasEnteredTheInput = false;
-//                //ResetGame(&mainBall, &paddle);
-//            }
-//
-//            if (mainBall.player2Point >= 5)
-//            {
-//                cout << "BLUE HAS WON THE GAME! \n";
-//                cout << "Do you want to restart the game? Press Space to continue the game. Press Q to quit the game \n";
-//                message.setString("BLUE WON  THE  GAME! \n Do you want to restart the game? \n Press    Space    to continue the game \n Press    Q    to quit the game \n");
-//                bool playerHasEnteredTheInput = false;
-//                while (!playerHasEnteredTheInput)
-//                {
-//                    window.clear();
-//                    window.draw(message);
-//                    window.display();
-//                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
-//                    {
-//                        playerHasEnteredTheInput = true;
-//                        mainBall.player1Point = 0;
-//                        mainBall.player2Point = -1;
-//                        mainBall.player1Score.setString("0");
-//                        mainBall.player2Score.setString("0");
-//                        paddle.paddle.setPosition(paddle.InitialPostion);
-//                        paddle.paddle.setSize(sf::Vector2f(15.0f, 145.0f));
-//                        leftPlayer.paddle.setSize(sf::Vector2f(15.0f, 145.0f));
-//                        mainBall.ball.setPosition(mainBall.InitialPosition);
-//                    }
-//
-//                    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q))
-//                    {
-//                        return 1;
-//                    }
-//                }
-//                playerHasEnteredTheInput = false;
-//                //ResetGame(&mainBall, &ai);
-//            }
-//        }
-//
-//
-//
-//#pragma endregion
+#pragma region GameHasEnded
+        bool didGameRestart = false;
+        if (mainBall.numberOfLives <= 0) 
+        {
+            GameOverText.setString("GAME OVER\nYOUR SCORE IS " + to_string(mainBall.playerScore) + "\n Press R to restart the game\n Q to quit the game");
+            bool playerHasEnteredTheInput = false;
+            while (!playerHasEnteredTheInput)
+            {
+                window.clear();
+                window.draw(GameOverText);
+                window.display();
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R)) 
+                {
+                    didGameRestart = true;
+                    playerHasEnteredTheInput = true;
+                    mainBall.numberOfLives = 3;
+                    mainBall.numberOfLivesText.setString("Number Of Lives = " + to_string(mainBall.numberOfLives));
+                    mainBall.playerScore = 0;
+                    mainBall.playerScoreText.setString("SCORE = " + to_string(mainBall.playerScore));
+                    gameLevel = 1;
+                }
+                else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) 
+                {
+                    return 1;
+                }
+            }
+        }
+
+#pragma endregion
 
 #pragma region AreAllBrickDestroyed
 
@@ -268,10 +254,63 @@ int main()
 
         if (areAllBrickDestroyed) 
         {
-            mainBall.ResetBallWithMoreSpeed();
-            for (int i = 0; i < bricks.size(); i++) {
+            mainBall.ResetBallWithMoreSpeed(didGameRestart);
+            didGameRestart = false;
+            /*for (int i = 0; i < bricks.size(); i++) {
                 bricks[i].isDead = false;
+            }*/
+            gameLevel = (gameLevel + 1) % 2;
+            bricks.clear();
+
+            if (gameLevel == 0)
+            {
+                vector<sf::Vector2f> BrickPosition;
+                sf::Vector2f brickStartPos = sf::Vector2f(620.f, 75.f);
+                brickCount = 2;
+                areAllBrickDestroyed = false;
+
+                for (float i = 0; i < brickCount; i++)
+                {
+                    BrickPosition.push_back(brickStartPos);
+                    cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
+                    brickStartPos.x -= 45;
+                    brickStartPos.y += 45;
+                }
+
+
+
+                for (float i = 0; i < BrickPosition.size(); i++)
+                {
+                    Brick brick(1, BrickPosition[i]);
+                    bricks.push_back(brick);
+                }
             }
+
+            if (gameLevel == 1) 
+            {
+                
+                vector<sf::Vector2f> BrickPosition;
+                sf::Vector2f brickStartPos = sf::Vector2f(37.5f, 75.f);
+                brickCount = 7;
+                areAllBrickDestroyed = false;
+
+                for (float i = 0; i < brickCount; i++)
+                {
+                    BrickPosition.push_back(brickStartPos);
+                    cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
+                    brickStartPos.x += 105;                    
+                }
+
+
+
+                for (float i = 0; i < BrickPosition.size(); i++)
+                {
+                    Brick brick(1, BrickPosition[i]);
+                    bricks.push_back(brick);
+                }
+            }
+
+
             areAllBrickDestroyed = false;
         }
 
@@ -288,6 +327,7 @@ int main()
             window.draw(bricks[i].brick);
         }
         window.draw(mainBall.numberOfLivesText);
+        window.draw(mainBall.playerScoreText);
         window.display();
 #pragma endregion
     }

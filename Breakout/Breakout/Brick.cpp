@@ -10,6 +10,9 @@ Brick::Brick(int numberOfHitsTakenToDestroy, sf::Vector2f pos)
     brick.setPosition(InitialPostion);
     brick.setSize(Size);
     brickRect = brick.getGlobalBounds();
+
+    scoreIncrement = 5;
+    scoreIncrementOnDestroy = 10;
     isDead = false;
 }
 

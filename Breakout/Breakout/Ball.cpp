@@ -23,7 +23,10 @@ Ball::Ball()
     numberOfLivesText.setPosition(570.f, 20.f);
     numberOfLivesText.setString("Number Of Lives = " + to_string(numberOfLives));
 
-
+    playerScoreText.setFont(font);
+    playerScoreText.setFillColor(sf::Color::White);
+    playerScoreText.setPosition(70.f, 20.f);
+    playerScoreText.setString("SCORE = " + to_string(playerScore));
 }
 
 void Ball::CollisionWithPaddle(sf::RectangleShape* paddle, bool hasLaunchedTheBall)
@@ -41,7 +44,7 @@ void Ball::CollisionWithPaddle(sf::RectangleShape* paddle, bool hasLaunchedTheBa
                 // cout << "Collision\n";
                 if (ball.getPosition().x > (paddle->getPosition().x + paddle->getSize().x * 4 / 5)) //Greater than 80%
                 {
-                    cout << "Collision 80\n";
+                    //cout << "Collision 80\n";
                     ballVelocity.y = -abs(ballVelocity.y);
                     srand(time(0));
                     int value = rand() % 100 + 600;
@@ -49,7 +52,7 @@ void Ball::CollisionWithPaddle(sf::RectangleShape* paddle, bool hasLaunchedTheBa
                 }
                 else if (ball.getPosition().x > (paddle->getPosition().x + paddle->getSize().x * 3 / 5) && ball.getPosition().x < (paddle->getPosition().x + paddle->getSize().x * 4 / 5)) //Greater than 60%, Less than 80%
                 {
-                    cout << "Collision 60 80 \n";
+                    //cout << "Collision 60 80 \n";
                     ballVelocity.y = -abs(ballVelocity.y);
                     srand(time(0));
                     int value = rand() % 100 + 500;
@@ -57,14 +60,14 @@ void Ball::CollisionWithPaddle(sf::RectangleShape* paddle, bool hasLaunchedTheBa
                 }
                 else if (ball.getPosition().x > (paddle->getPosition().x + paddle->getSize().x * 2 / 5) && ball.getPosition().x < (paddle->getPosition().x + paddle->getSize().x * 3 / 5)) //Greater than 40%, Less than 60%
                 {
-                    cout << "Collision 50\n";
+                    //cout << "Collision 50\n";
                     ballVelocity.y = -abs(ballVelocity.y);
                     cout << "Ball velocity =  " << ballVelocity.y << endl;
                     ballVelocity.x = abs(0.f);
                 }
                 else if (ball.getPosition().x > (paddle->getPosition().x + paddle->getSize().x * 1 / 5) && ball.getPosition().x < (paddle->getPosition().x + paddle->getSize().x * 2 / 5)) //Greater than 20%, Less than 40%
                 {
-                    cout << "Collision 40\n";
+                    //cout << "Collision 40\n";
                     ballVelocity.y = -abs(ballVelocity.y);
                     srand(time(0));
                     int value = rand() % 100 + 500;
@@ -72,7 +75,7 @@ void Ball::CollisionWithPaddle(sf::RectangleShape* paddle, bool hasLaunchedTheBa
                 }
                 if (ball.getPosition().x < (paddle->getPosition().x + paddle->getSize().x * 1 / 5)) //Less than 20%
                 {
-                    cout << "Collision 20\n";
+                    //cout << "Collision 20\n";
                     ballVelocity.y = -abs(ballVelocity.y);
                     srand(time(0));
                     int value = rand() % 100 + 600;
@@ -92,12 +95,16 @@ void Ball::CollisionWithBrick(Brick* brick)
 
     if (ballRect.intersects(brickRect))
     {
+        playerScore += brick->scoreIncrement;
         brick->numberOfHitsTakenToDestroy--;
         if (brick->numberOfHitsTakenToDestroy <= 0) {
             brick->isDead = true;
+            playerScore += brick->scoreIncrementOnDestroy;
         }
-        ballVelocity.x = -(ballVelocity.x);
+        ballVelocity.x = (ballVelocity.x);
         ballVelocity.y = -(ballVelocity.y);
+
+        playerScoreText.setString("SCORE = " + to_string(playerScore));
     }
 }
 
@@ -151,12 +158,21 @@ void Ball::UpdateBallPosition(sf::RenderWindow* window, float delta_s)
     //pokeball.setPosition(sf::Vector2f(ball.getPosition().x - ball.getRadius() + 2.f, ball.getPosition().y - ball.getRadius()));
 }
 
-void Ball::ResetBallWithMoreSpeed() 
+void Ball::ResetBallWithMoreSpeed(bool didGameRestart) 
 {
-    hasLaunchedTheBall = false;
-    ballInitialVelocity.x += 200;
-    ballInitialVelocity.y += 500;
-    ballVelocity = ballInitialVelocity;
+    if (!didGameRestart) {
+        hasLaunchedTheBall = false;
+        ballInitialVelocity.x *= 1.1f;
+        ballInitialVelocity.y *= 1.2;
+        ballVelocity = ballInitialVelocity;
+    }
+
+    else {
+        hasLaunchedTheBall = false;
+        ballInitialVelocity = sf::Vector2f(-600.f, -400.f);
+        ballVelocity = ballInitialVelocity;
+    }
+    
 }
 
 void Ball::UpdatePlayerLives() 

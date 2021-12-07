@@ -29,7 +29,7 @@ public:
 	sf::Font font;
 	sf::Text numberOfLivesText;
 	sf::Text gameLevel;
-	sf::Text playerScore;
+	sf::Text playerScoreText;
 
 	sf::SoundBuffer buffer;
 	sf::Sound ballPaddleSound;
@@ -41,14 +41,14 @@ public:
 	sf::Sprite ballSprite;
 
 	int numberOfLives = 3;
-
+	int playerScore = 0;
 	bool hasLaunchedTheBall = false;
 
 	Ball();
 	void CollisionWithPaddle(sf::RectangleShape* paddle, bool hasLaunchedTheBall);
 	void CollisionWithBrick(Brick* brick);
 	void UpdateBallPosition(sf::RenderWindow* window, float delta_s);
-	void ResetBallWithMoreSpeed();
+	void ResetBallWithMoreSpeed(bool didGameRestart);
 	void UpdatePlayerLives();
 };
 

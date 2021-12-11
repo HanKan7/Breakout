@@ -126,3 +126,36 @@ void Paddle::CollisionCheckWithBall(Ball* ball)
     }
 
 }
+
+void Paddle::CollisionWithPowerUp(PowerUp* powerUp)
+{
+    sf::FloatRect powerUpRect = powerUp->powerUp.getGlobalBounds();
+    sf::FloatRect paddleRect = paddle.getGlobalBounds();
+
+    if (paddleRect.intersects(powerUpRect)) 
+    {
+        powerUp->powerUpCollected = true;
+        powerUp->bullet.setPosition(Vector2f(paddle.getPosition().x + paddle.getSize().x / 2, paddle.getPosition().y));
+    }
+}
+
+void Paddle::ShootBullet(PowerUp* powerUp,float delta_s)
+{
+    if (powerUp->powerUpCollected && !bulletReachedEnd) 
+    {
+        powerUp->shotBullet = true;
+
+        auto ballPos = powerUp->bullet.getPosition();
+        ballPos += powerUp->bulletVelocity * delta_s;
+
+        if (powerUp->bullet.getPosition().y <= 0)
+        {
+            //cout << "reached end\n";
+            powerUp->shotBullet = false;
+            powerUp->bullet.setPosition(Vector2f(paddle.getPosition().x + paddle.getSize().x / 2, paddle.getPosition().y));
+            bulletReachedEnd = true;
+        }
+
+        powerUp->bullet.setPosition(ballPos);
+    }
+}

@@ -1,5 +1,6 @@
 #include"Paddle.h"
 #include"Brick.h"
+#include"PowerUp.h"
 using namespace std;
 
 
@@ -9,10 +10,15 @@ int main()
     sf::RenderWindow window(sf::VideoMode(800, 600), "BREAKOUT!");
     window.setVerticalSyncEnabled(true);
     Clock clock;
+    Clock powerUpClock;
     int gameLevel = 0;
+    int powerUpScore = 35;
+    float powerUpClockValue = 0;
+    float powerUpCollectedClockValue = 0;
 
     Paddle paddle;
     Ball mainBall;
+    PowerUp powerUp;
     vector<Brick> bricks;
 
     sf::Font font;
@@ -27,6 +33,9 @@ int main()
     GameOverText.setPosition(300.f, 300.f);
 
     bool areAllBrickDestroyed;
+    bool powerUpSpawned = false;
+    bool powerUpCollected = false;
+  
     int brickCount;
 #pragma region BrickInit
     
@@ -34,7 +43,7 @@ int main()
     {
         vector<sf::Vector2f> BrickPosition;
         sf::Vector2f brickStartPos = sf::Vector2f(620.f, 75.f);
-        brickCount = 2;
+        brickCount = 12;
         areAllBrickDestroyed = false;
 
         for (float i = 0; i < brickCount; i++)
@@ -42,7 +51,7 @@ int main()
             BrickPosition.push_back(brickStartPos);
             cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
             brickStartPos.x -= 45;
-            brickStartPos.y += 45;
+            brickStartPos.y += 35;
         }
 
         
@@ -90,17 +99,6 @@ int main()
             }
         }
 #pragma endregion
-        //
-        //#pragma region ViewPort
-        //        /*sf::View view;
-        //        auto windowSize = window.getSize();
-        //        view.reset(sf::FloatRect(0.0f, 0.0f, windowSize.x, windowSize.y));
-        //        window.setView(view);*/
-        //#pragma endregion
-        //
-
-
-
 
 #pragma region KeyBoardInput
         paddle.Movement(&paddle.paddle, 10.5f);
@@ -113,24 +111,8 @@ int main()
         {
             mainBall.hasLaunchedTheBall = true;
         }
-        //        if (humanVsHuman == 1)
-        //        {
-        //            leftPlayer.Movement(&leftPlayer.paddle, false, 10.5f, false);
-        //        }
-        //        if (fourPlayerMode == 1)
-        //        {
-        //            smallLeftPlayer.Movement(&smallLeftPlayer.paddle, false, 12.5f, true);
-        //            smallRightPlayer.Movement(&smallRightPlayer.paddle, true, 12.5, true);
-        //        }
-        //
-        //        if (blockInTheMiddle == 1)
-        //        {
-        //            wallLeft.WallMovement(5);
-        //            wallRight.WallMovement(5);
-        //        }
-        //
 #pragma endregion
-//
+
 #pragma region UpdateBallsPosition
         if (mainBall.hasLaunchedTheBall)
         {
@@ -150,6 +132,13 @@ int main()
         for (int i = 0; i < bricks.size(); i++) 
         {
             mainBall.CollisionWithBrick(&bricks[i]);
+        }
+        if (powerUpCollected) {
+
+            for (int i = 0; i < bricks.size(); i++)
+            {
+                powerUp.CollisionWithBrick(&bricks[i], &mainBall);
+            }
         }
         //        mainBall.CollisionCheck(paddle);
         //        mainBall.CollisionCheck(leftPlayer);
@@ -174,6 +163,58 @@ int main()
         //            }
         //        }
 #pragma endregion   
+
+        if (mainBall.playerScore >= powerUpScore) 
+        {
+            if (!powerUpSpawned) 
+            {
+                powerUpClockValue = powerUp.powerUpClock.getElapsedTime().asSeconds();
+                powerUpSpawned = true;
+            }
+
+            if (powerUpClockValue + 5 > powerUp.powerUpClock.getElapsedTime().asSeconds()) 
+            {
+                powerUp.SpawnPowerUp(delta_s);
+                paddle.CollisionWithPowerUp(&powerUp);
+            }
+            else 
+            {
+                cout << "false";
+                powerUpScore += powerUpScore * 1.5f;
+                powerUp.powerUp.setPosition(powerUp.InitialPosition);
+                powerUpSpawned = false;
+
+            }
+            
+
+        }
+
+        if (powerUp.powerUpCollected)
+        {
+            if (!powerUpCollected) 
+            {
+                cout << "powerUpCOlle";
+                powerUpCollectedClockValue = paddle.powerUpCollectedTime.getElapsedTime().asSeconds();
+                powerUpCollected = true;
+            }
+
+            if (powerUpCollectedClockValue + 5 > paddle.powerUpCollectedTime.getElapsedTime().asSeconds()) 
+            {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+                {
+                    paddle.bulletReachedEnd = false;
+                }
+                if(!powerUp.shotBullet && !paddle.bulletReachedEnd)
+                powerUp.bullet.setPosition(Vector2f(paddle.paddle.getPosition().x + paddle.paddle.getSize().x / 2, paddle.paddle.getPosition().y));
+                paddle.ShootBullet(&powerUp, delta_s);
+               
+            }
+            else 
+            {
+                powerUp.powerUpCollected = false;
+                powerUpCollected = false;
+            }      
+        }
 //
 //#pragma region PowerUp
 //        if (!powerUpSpawned)
@@ -206,10 +247,6 @@ int main()
 //#pragma endregion
 //
 // 
-        if (mainBall.numberOfLives <= 0) 
-        {
-
-        }
 #pragma region GameHasEnded
         bool didGameRestart = false;
         if (mainBall.numberOfLives <= 0) 
@@ -222,15 +259,21 @@ int main()
                 window.draw(GameOverText);
                 window.display();
 
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R)) 
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))
                 {
                     didGameRestart = true;
                     playerHasEnteredTheInput = true;
                     mainBall.numberOfLives = 3;
+                    powerUpScore = 35;
                     mainBall.numberOfLivesText.setString("Number Of Lives = " + to_string(mainBall.numberOfLives));
                     mainBall.playerScore = 0;
                     mainBall.playerScoreText.setString("SCORE = " + to_string(mainBall.playerScore));
                     gameLevel = 1;
+
+                    for (int i = 0; i < bricks.size(); i++)
+                    {
+                        bricks[i].isDead = false;
+                    }
                 }
                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) 
                 {
@@ -259,14 +302,14 @@ int main()
             /*for (int i = 0; i < bricks.size(); i++) {
                 bricks[i].isDead = false;
             }*/
-            gameLevel = (gameLevel + 1) % 2;
+            gameLevel = (gameLevel + 1) % 3;
             bricks.clear();
 
             if (gameLevel == 0)
             {
                 vector<sf::Vector2f> BrickPosition;
                 sf::Vector2f brickStartPos = sf::Vector2f(620.f, 75.f);
-                brickCount = 2;
+                brickCount = 12;
                 areAllBrickDestroyed = false;
 
                 for (float i = 0; i < brickCount; i++)
@@ -274,7 +317,7 @@ int main()
                     BrickPosition.push_back(brickStartPos);
                     cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
                     brickStartPos.x -= 45;
-                    brickStartPos.y += 45;
+                    brickStartPos.y += 35;
                 }
 
 
@@ -291,14 +334,58 @@ int main()
                 
                 vector<sf::Vector2f> BrickPosition;
                 sf::Vector2f brickStartPos = sf::Vector2f(37.5f, 75.f);
-                brickCount = 7;
+                brickCount = 12;
                 areAllBrickDestroyed = false;
 
-                for (float i = 0; i < brickCount; i++)
+                for (float i = 0; i < 7; i++)
                 {
                     BrickPosition.push_back(brickStartPos);
                     cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
                     brickStartPos.x += 105;                    
+                }
+
+                brickStartPos = Vector2f(142.5f, 200);
+
+                for (float i = 0; i < 5; i++)
+                {
+                    BrickPosition.push_back(brickStartPos);
+                    cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
+                    brickStartPos.x += 105;
+                }
+
+
+
+                for (float i = 0; i < BrickPosition.size(); i++)
+                {
+                    Brick brick(1, BrickPosition[i]);
+                    bricks.push_back(brick);
+                }
+            }
+
+            if (gameLevel == 2)
+            {
+
+                vector<sf::Vector2f> BrickPosition;
+                sf::Vector2f brickStartPos = sf::Vector2f(600, 100.f);
+                brickCount = 12;
+                areAllBrickDestroyed = false;
+
+                for (float i = 0; i < 6; i++)
+                {
+                    BrickPosition.push_back(brickStartPos);
+                    cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
+                    brickStartPos.x -= 50;
+                    brickStartPos.y += 50;
+                }
+
+                brickStartPos = Vector2f(100, 100);
+
+                for (float i = 0; i < 6; i++)
+                {
+                    BrickPosition.push_back(brickStartPos);
+                    cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
+                    brickStartPos.x += 50;
+                    brickStartPos.y += 50;
                 }
 
 
@@ -323,11 +410,30 @@ int main()
         window.draw(mainBall.ball);
         for (int i = 0; i < bricks.size(); i++) 
         {
-            if(!bricks[i].isDead)
-            window.draw(bricks[i].brick);
+            if (!bricks[i].isDead)
+            {
+                bricks[i].brick.setTexture(&bricks[i].texture);
+                window.draw(bricks[i].brick);
+            }
+            
         }
+
+        if (powerUpSpawned) 
+        {
+            window.draw(powerUp.powerUp);
+        }
+
+        if (powerUp.powerUpCollected && powerUpCollected) 
+        {
+            cout << "Drawing here\n";
+            window.draw(powerUp.bullet);
+        }
+
+
         window.draw(mainBall.numberOfLivesText);
         window.draw(mainBall.playerScoreText);
+
+        window.draw(mainBall.ballSprite);
         window.display();
 #pragma endregion
     }

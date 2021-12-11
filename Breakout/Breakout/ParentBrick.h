@@ -6,6 +6,8 @@
 #include <SFML/System.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Main.hpp>
+#include<iostream>
+using namespace std;
 class ParentBrick
 {
 public:

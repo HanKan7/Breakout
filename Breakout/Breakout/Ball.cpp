@@ -27,6 +27,12 @@ Ball::Ball()
     playerScoreText.setFillColor(sf::Color::White);
     playerScoreText.setPosition(70.f, 20.f);
     playerScoreText.setString("SCORE = " + to_string(playerScore));
+
+    const char* texturePath("Ball.png");
+    if (!texture.loadFromFile(texturePath)) {
+        cout << "Failed to load texture\n";
+    }
+    ball.setTexture(&texture);
 }
 
 void Ball::CollisionWithPaddle(sf::RectangleShape* paddle, bool hasLaunchedTheBall)
@@ -34,6 +40,7 @@ void Ball::CollisionWithPaddle(sf::RectangleShape* paddle, bool hasLaunchedTheBa
     if (!hasLaunchedTheBall)
     {
         ball.setPosition(paddle->getPosition() + sf::Vector2f(0.f, -20.f));
+        ballSprite.setPosition(ball.getPosition());
     }
     else 
     {
@@ -118,30 +125,17 @@ void Ball::UpdateBallPosition(sf::RenderWindow* window, float delta_s)
         //bounce.play();
         ballVelocity.x = -abs(ballVelocity.x);
         ballPos.x = maxX;
-        //player2Point++;
-        //cout << "Left Player Score = " << player2Point << "           " << "Right Player Score = " << player1Point << endl;
-        //player2Score.setString(to_string(player2Point));
-        //ball.setPosition(InitialPosition);
-        //ballVelocity = ballInitialVelocity;
         return;
     }
 
     if (ballPos.x <= 0.0) {
-        //bounce.play();
         ballVelocity.x = abs(ballVelocity.x);
         ballPos.x = 0.f;
-        //player1Point++;
-        //cout << "Left Player Score = " << player2Point << "           " << "Right Player Score = " << player1Point << endl;
-        //player1Score.setString(to_string(player1Point));
-        //ball.setPosition(InitialPosition);
-        //ballVelocity = ballInitialVelocity;
         return;
     }
 
     auto maxY = window->getSize().y - ball.getRadius() * 2.0f;
     if (ballPos.y >= maxY) {
-        //bounce.play();
-        //ballVelocity.y = -abs(ballVelocity.y);
         ballPos.y = maxY;
         hasLaunchedTheBall = false;
         ballVelocity = ballInitialVelocity;
@@ -149,13 +143,10 @@ void Ball::UpdateBallPosition(sf::RenderWindow* window, float delta_s)
     }
 
     if (ballPos.y <= 0.0) {
-        //bounce.play();
         ballVelocity.y = abs(ballVelocity.y);
         ballPos.y = 0.f;
     }
     ball.setPosition(ballPos);
-    //pokeball.setPosition(ballPos);
-    //pokeball.setPosition(sf::Vector2f(ball.getPosition().x - ball.getRadius() + 2.f, ball.getPosition().y - ball.getRadius()));
 }
 
 void Ball::ResetBallWithMoreSpeed(bool didGameRestart) 

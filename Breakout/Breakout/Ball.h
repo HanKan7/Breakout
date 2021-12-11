@@ -31,11 +31,22 @@ public:
 	sf::Text gameLevel;
 	sf::Text playerScoreText;
 
-	sf::SoundBuffer buffer;
+	SoundBuffer ballPaddleBuffer;
+	SoundBuffer ballDamageBuffer;
+	SoundBuffer ballDestroyBuffer;
+	SoundBuffer ballWallBuffer;
+	SoundBuffer playerLostAlifeBuffer;
+	SoundBuffer gameOverBuffer;
+	SoundBuffer winLevelBuffer;
+
+
 	sf::Sound ballPaddleSound;
-	sf::Sound hitBrick;
-	sf::Sound DamageBrick;
-	sf::Sound wallSound;
+	sf::Sound ballDamageSound;
+	sf::Sound ballDestroySound;
+	sf::Sound ballWallSound;
+	sf::Sound playerLostAlifeSound;
+	sf::Sound gameOverSound;
+	sf::Sound winLevelSound;
 
 	sf::Texture texture;
 	sf::Sprite ballSprite;

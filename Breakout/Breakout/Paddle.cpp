@@ -83,7 +83,7 @@ void Paddle::CollisionCheckWithBall(Ball* ball)
             // cout << "Collision\n";
             if (ball->ball.getPosition().x > (paddle.getPosition().x + paddle.getSize().x * 4 / 5)) //Greater than 80%
             {
-                cout << "Collision 80\n";
+                //cout << "Collision 80\n";
                 ball->ballVelocity.y = -abs(ball->ballVelocity.y);
                 srand(time(0));
                 int value = rand() % 100 + 600;
@@ -91,7 +91,7 @@ void Paddle::CollisionCheckWithBall(Ball* ball)
             }
             else if (ball->ball.getPosition().x > (paddle.getPosition().x + paddle.getSize().x * 3 / 5) && ball->ball.getPosition().x < (paddle.getPosition().x + paddle.getSize().x * 4 / 5)) //Greater than 60%, Less than 80%
             {
-                cout << "Collision 60 80 \n";
+                //cout << "Collision 60 80 \n";
                 ball->ballVelocity.y = -abs(ball->ballVelocity.y);
                 srand(time(0));
                 int value = rand() % 100 + 500;
@@ -99,14 +99,14 @@ void Paddle::CollisionCheckWithBall(Ball* ball)
             }
             else if (ball->ball.getPosition().x > (paddle.getPosition().x + paddle.getSize().x * 2 / 5) && ball->ball.getPosition().x < (paddle.getPosition().x + paddle.getSize().x * 3 / 5)) //Greater than 40%, Less than 60%
             {
-                cout << "Collision 50\n";
+                //cout << "Collision 50\n";
                 ball->ballVelocity.y = -abs(ball->ballVelocity.y);
-                cout << "Ball velocity =  " << ball->ballVelocity.y << endl;
+                //cout << "Ball velocity =  " << ball->ballVelocity.y << endl;
                 ball->ballVelocity.x = abs(0.f);
             }
             else if (ball->ball.getPosition().x > (paddle.getPosition().x + paddle.getSize().x * 1 / 5) && ball->ball.getPosition().x < (paddle.getPosition().x + paddle.getSize().x * 2 / 5)) //Greater than 20%, Less than 40%
             {
-                cout << "Collision 40\n";
+                //cout << "Collision 40\n";
                 ball->ballVelocity.y = -abs(ball->ballVelocity.y);
                 srand(time(0));
                 int value = rand() % 100 + 500;
@@ -114,7 +114,7 @@ void Paddle::CollisionCheckWithBall(Ball* ball)
             }
             if (ball->ball.getPosition().x < (paddle.getPosition().x + paddle.getSize().x * 1 / 5)) //Less than 20%
             {
-                cout << "Collision 20\n";
+                //cout << "Collision 20\n";
                 ball->ballVelocity.y = -abs(ball->ballVelocity.y);
                 srand(time(0));
                 int value = rand() % 100 + 600;

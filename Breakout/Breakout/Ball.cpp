@@ -33,6 +33,46 @@ Ball::Ball()
         cout << "Failed to load texture\n";
     }
     ball.setTexture(&texture);
+
+    const char* bufferPath = "BallPaddle.wav";
+    if (!ballPaddleBuffer.loadFromFile(bufferPath)) {
+        cout << "Failed to load buffer\n";
+    }
+    const char* a = "BallDamage.wav";
+    if (!ballDamageBuffer.loadFromFile(a)) {
+        cout << "Failed to load buffer a\n";
+    }
+    const char* b = "BallDestroy.wav";
+    if (!ballDestroyBuffer.loadFromFile(b)) {
+        cout << "Failed to load buffer b\n";
+    }
+    const char* c = "BallWall.wav";
+    if (!ballWallBuffer.loadFromFile(c)) {
+        cout << "Failed to load buffer c\n";
+    }
+    const char* d = "PlayerLostALife.wav";
+    if (!playerLostAlifeBuffer.loadFromFile(d)) {
+        cout << "Failed to load buffer d\n";
+    }
+    const char* e = "GameOver.wav";
+    if (!gameOverBuffer.loadFromFile(e)) {
+        cout << "Failed to load buffer e\n";
+    }
+    const char* f = "WinLevel.wav";
+    if (!winLevelBuffer.loadFromFile(e)) {
+        cout << "Failed to load buffer e\n";
+    }
+
+    ballPaddleSound.setBuffer(ballPaddleBuffer);
+    ballDamageSound.setBuffer(ballDamageBuffer);
+    ballDestroySound.setBuffer(ballDestroyBuffer);
+    ballWallSound.setBuffer(ballWallBuffer);
+    playerLostAlifeSound.setBuffer(playerLostAlifeBuffer);
+    gameOverSound.setBuffer(gameOverBuffer);
+    winLevelSound.setBuffer(winLevelBuffer);
+
+
+
 }
 
 void Ball::CollisionWithPaddle(sf::RectangleShape* paddle, bool hasLaunchedTheBall)
@@ -48,6 +88,7 @@ void Ball::CollisionWithPaddle(sf::RectangleShape* paddle, bool hasLaunchedTheBa
         sf::FloatRect paddleRect = paddle->getGlobalBounds();
 
             if (paddleRect.intersects(ballRect)) {
+                ballPaddleSound.play();
                 // cout << "Collision\n";
                 if (ball.getPosition().x > (paddle->getPosition().x + paddle->getSize().x * 4 / 5)) //Greater than 80%
                 {
@@ -69,7 +110,7 @@ void Ball::CollisionWithPaddle(sf::RectangleShape* paddle, bool hasLaunchedTheBa
                 {
                     //cout << "Collision 50\n";
                     ballVelocity.y = -abs(ballVelocity.y);
-                    cout << "Ball velocity =  " << ballVelocity.y << endl;
+                    //cout << "Ball velocity =  " << ballVelocity.y << endl;
                     ballVelocity.x = abs(0.f);
                 }
                 else if (ball.getPosition().x > (paddle->getPosition().x + paddle->getSize().x * 1 / 5) && ball.getPosition().x < (paddle->getPosition().x + paddle->getSize().x * 2 / 5)) //Greater than 20%, Less than 40%
@@ -105,8 +146,13 @@ void Ball::CollisionWithBrick(Brick* brick)
         playerScore += brick->scoreIncrement;
         brick->numberOfHitsTakenToDestroy--;
         if (brick->numberOfHitsTakenToDestroy <= 0) {
+            ballDestroySound.play();
             brick->isDead = true;
             playerScore += brick->scoreIncrementOnDestroy;
+        }
+        else 
+        {
+            ballDamageSound.play();
         }
         ballVelocity.x = (ballVelocity.x);
         ballVelocity.y = -(ballVelocity.y);
@@ -123,12 +169,14 @@ void Ball::UpdateBallPosition(sf::RenderWindow* window, float delta_s)
     auto maxX = window->getSize().x - ball.getRadius() * 2.0f;
     if (ballPos.x >= maxX) {
         //bounce.play();
+        ballWallSound.play();
         ballVelocity.x = -abs(ballVelocity.x);
         ballPos.x = maxX;
         return;
     }
 
     if (ballPos.x <= 0.0) {
+        ballWallSound.play();
         ballVelocity.x = abs(ballVelocity.x);
         ballPos.x = 0.f;
         return;
@@ -139,10 +187,12 @@ void Ball::UpdateBallPosition(sf::RenderWindow* window, float delta_s)
         ballPos.y = maxY;
         hasLaunchedTheBall = false;
         ballVelocity = ballInitialVelocity;
+        playerLostAlifeSound.play();
         UpdatePlayerLives();
     }
 
     if (ballPos.y <= 0.0) {
+        ballWallSound.play();
         ballVelocity.y = abs(ballVelocity.y);
         ballPos.y = 0.f;
     }

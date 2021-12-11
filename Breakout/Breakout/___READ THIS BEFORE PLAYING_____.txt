@@ -1,0 +1,10 @@
+Implemented all the primary objectives
+
+Also implemented Secondary objectives L, M , N (paddle shoots one bullet which destroys all the bricks in its path)
+
+
+CONTROLS
+
+USE ARROWS, MOUSE TO MOVE 
+SPACE/LEFT CLICK TO SHOOT
+S/RIGHT CLICK TO SHOOT

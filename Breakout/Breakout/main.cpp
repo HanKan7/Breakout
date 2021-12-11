@@ -12,7 +12,7 @@ int main()
     Clock clock;
     Clock powerUpClock;
     int gameLevel = 0;
-    int powerUpScore = 35;
+    int powerUpScore = 55;
     float powerUpClockValue = 0;
     float powerUpCollectedClockValue = 0;
 
@@ -49,7 +49,7 @@ int main()
         for (float i = 0; i < brickCount; i++)
         {
             BrickPosition.push_back(brickStartPos);
-            cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
+            //cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
             brickStartPos.x -= 45;
             brickStartPos.y += 35;
         }
@@ -126,7 +126,6 @@ int main()
 #pragma endregion
 
 #pragma region Collision Check
-        //paddle.CollisionCheckWithBall(&mainBall);
         mainBall.CollisionWithPaddle(&paddle.paddle, mainBall.hasLaunchedTheBall);
 
         for (int i = 0; i < bricks.size(); i++) 
@@ -179,7 +178,7 @@ int main()
             }
             else 
             {
-                cout << "false";
+                //cout << "false";
                 powerUpScore += powerUpScore * 1.5f;
                 powerUp.powerUp.setPosition(powerUp.InitialPosition);
                 powerUpSpawned = false;
@@ -193,7 +192,7 @@ int main()
         {
             if (!powerUpCollected) 
             {
-                cout << "powerUpCOlle";
+                //cout << "powerUpCOlle";
                 powerUpCollectedClockValue = paddle.powerUpCollectedTime.getElapsedTime().asSeconds();
                 powerUpCollected = true;
             }
@@ -215,42 +214,12 @@ int main()
                 powerUpCollected = false;
             }      
         }
-//
-//#pragma region PowerUp
-//        if (!powerUpSpawned)
-//        {
-//            power.SpawnPowerUp();
-//            powerUpSpawned = true;
-//        }
-//        if (!clockValueTaken)
-//        {
-//            clockValue = powerUpClock.getElapsedTime().asSeconds();
-//            clockValueTaken = true;
-//        }
-//        if (powerUpSpawned && powerUpClock.getElapsedTime().asSeconds() >= clockValue + 5)
-//        {
-//            power.SpawnPowerUp();
-//            clockValueTaken = false;
-//        }
-//#pragma endregion
-//
-//
-//#pragma region AiPaddleClamp
-//        if (humanVsHuman == 2)
-//        {
-//            sf::Vector2f BallPosMinusAiPos = mainBall.ball.getPosition() - leftPlayer.paddle.getPosition();
-//            leftPlayer.AiMovement(&leftPlayer.paddle, BallPosMinusAiPos, 0.15f);
-//            leftPlayer.Clamp(&leftPlayer.paddle);
-//        }
-//
-//
-//#pragma endregion
-//
-// 
+
 #pragma region GameHasEnded
         bool didGameRestart = false;
         if (mainBall.numberOfLives <= 0) 
         {
+            mainBall.gameOverSound.play();
             GameOverText.setString("GAME OVER\nYOUR SCORE IS " + to_string(mainBall.playerScore) + "\n Press R to restart the game\n Q to quit the game");
             bool playerHasEnteredTheInput = false;
             while (!playerHasEnteredTheInput)
@@ -264,10 +233,11 @@ int main()
                     didGameRestart = true;
                     playerHasEnteredTheInput = true;
                     mainBall.numberOfLives = 3;
-                    powerUpScore = 35;
+                    powerUpScore = 55;
                     mainBall.numberOfLivesText.setString("Number Of Lives = " + to_string(mainBall.numberOfLives));
                     mainBall.playerScore = 0;
                     mainBall.playerScoreText.setString("SCORE = " + to_string(mainBall.playerScore));
+                    //mainBall.ballVelocity = mainBall.ballInitialVelocity();
                     gameLevel = 1;
 
                     for (int i = 0; i < bricks.size(); i++)
@@ -297,6 +267,7 @@ int main()
 
         if (areAllBrickDestroyed) 
         {
+            mainBall.winLevelSound.play();
             mainBall.ResetBallWithMoreSpeed(didGameRestart);
             didGameRestart = false;
             /*for (int i = 0; i < bricks.size(); i++) {
@@ -315,7 +286,7 @@ int main()
                 for (float i = 0; i < brickCount; i++)
                 {
                     BrickPosition.push_back(brickStartPos);
-                    cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
+                    //cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
                     brickStartPos.x -= 45;
                     brickStartPos.y += 35;
                 }
@@ -340,7 +311,7 @@ int main()
                 for (float i = 0; i < 7; i++)
                 {
                     BrickPosition.push_back(brickStartPos);
-                    cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
+                    //cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
                     brickStartPos.x += 105;                    
                 }
 
@@ -349,7 +320,7 @@ int main()
                 for (float i = 0; i < 5; i++)
                 {
                     BrickPosition.push_back(brickStartPos);
-                    cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
+                    //cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
                     brickStartPos.x += 105;
                 }
 
@@ -358,6 +329,8 @@ int main()
                 for (float i = 0; i < BrickPosition.size(); i++)
                 {
                     Brick brick(1, BrickPosition[i]);
+                    brick.numberOfHitsTakenToDestroy = 3;
+                    brick.color = Color::Red;
                     bricks.push_back(brick);
                 }
             }
@@ -373,7 +346,7 @@ int main()
                 for (float i = 0; i < 6; i++)
                 {
                     BrickPosition.push_back(brickStartPos);
-                    cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
+                    //cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
                     brickStartPos.x -= 50;
                     brickStartPos.y += 50;
                 }
@@ -383,7 +356,7 @@ int main()
                 for (float i = 0; i < 6; i++)
                 {
                     BrickPosition.push_back(brickStartPos);
-                    cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
+                    //cout << " X = " << brickStartPos.x << "    Y = " << brickStartPos.y << endl;
                     brickStartPos.x += 50;
                     brickStartPos.y += 50;
                 }
@@ -425,7 +398,6 @@ int main()
 
         if (powerUp.powerUpCollected && powerUpCollected) 
         {
-            cout << "Drawing here\n";
             window.draw(powerUp.bullet);
         }
 
